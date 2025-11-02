@@ -1,0 +1,37 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 1. Configurar Flutter (Esto instala Flutter y el SDK de Android)
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable' # Usa la rama estable de Flutter
+        cache: true
+
+    # 2. Descargar las dependencias del proyecto (paquetes)
+    - name: Get Flutter dependencies
+      run: flutter pub get
+
+    # 3. Compilar la aplicación para Android
+    - name: Build Flutter APK
+      run: flutter build apk --release 
+      # El flag --release genera el APK optimizado y listo para subir, aunque requiere keysigning para Play Store
+
+    # 4. Subir el APK generado para que puedas descargarlo
+    - name: Upload APK as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-apk
+        # La ruta estándar de un APK de Flutter
+        path: build/app/outputs/flutter-apk/app-release.apk 
